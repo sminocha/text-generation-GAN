@@ -5,8 +5,6 @@ This project is based on the previous work of LantaoYu. https://github.com/Lanta
 
 ## Download
 
-GET PIPELINE FROM RYAN TO FIGURE OUT STEPS TO GET SST PREPROCESSING
-
 1. Download SST dataset in this way....
 2. Remove the zip files.
 3. then simply run this command to turn SST PTB trees into sentences with corresponding sentiment label
