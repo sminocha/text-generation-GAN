@@ -25,4 +25,12 @@ Our baseline (**baseline.py**) is built around a Laplacian estimate of relative 
 The baseline model delivers strong results with respect to true sentiment of a given string, but performs very poorly in terms of intelligence and grammar.
 
 ## Usage
->python baseline.py
+>python baseline.py [--s [sentiment]] [--n [numWords]]
+
+Sentiment must be in the range 0 to 4, inclusive. numWords must be larger than 0. Running without arguments is equivalent to:
+
+>python baseline.py --s 4 --n 25
+
+The output of the model with this configuration should be:
+
+>breathtaking universal thoughtful kinnear first-class breathtakingly dazzling tears wonderful understated scope captivating pacino exceptional masterpiece ferrara grace splendid roles heartwarming stunning finely hugely vibrant delightfully
