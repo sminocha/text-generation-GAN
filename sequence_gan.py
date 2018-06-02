@@ -7,6 +7,9 @@ from discriminator import Discriminator
 from rollout import ROLLOUT
 from target_lstm import TARGET_LSTM
 import _pickle as cPickle
+import sys
+import os
+import pickle
 
 #########################################################################################
 #  Generator  Hyper-parameters
@@ -57,7 +60,7 @@ def target_loss(sess, target_lstm, data_loader):
     nll = []
     data_loader.reset_pointer()
 
-    for it in xrange(data_loader.num_batch):
+    for it in range(data_loader.num_batch):
         batch = data_loader.next_batch()
         g_loss = sess.run(target_lstm.pretrain_loss, {target_lstm.x: batch})
         nll.append(g_loss)
@@ -70,13 +73,12 @@ def pre_train_epoch(sess, trainable_model, data_loader):
     supervised_g_losses = []
     data_loader.reset_pointer()
 
-    for it in xrange(data_loader.num_batch):
+    for it in range(data_loader.num_batch):
         batch = data_loader.next_batch()
         _, g_loss = trainable_model.pretrain_step(sess, batch)
         supervised_g_losses.append(g_loss)
 
     return np.mean(supervised_g_losses)
-
 
 def main():
     random.seed(SEED)
@@ -89,7 +91,8 @@ def main():
     dis_data_loader = Dis_dataloader(BATCH_SIZE)
 
     generator = Generator(vocab_size, BATCH_SIZE, EMB_DIM, HIDDEN_DIM, SEQ_LENGTH, START_TOKEN)
-    target_params = cPickle.load(open('save/target_params.pkl', 'wb'))
+    
+    target_params = pickle.load(open('save/target_params_py3.pkl', 'rb'))
     target_lstm = TARGET_LSTM(vocab_size, BATCH_SIZE, EMB_DIM, HIDDEN_DIM, SEQ_LENGTH, START_TOKEN, target_params) # The oracle model
 
     discriminator = Discriminator(sequence_length=20, num_classes=2, vocab_size=vocab_size, embedding_size=dis_embedding_dim, 
@@ -108,7 +111,7 @@ def main():
     #  pre-train generator
     print('Start pre-training...')
     log.write('pre-training...\n')
-    for epoch in xrange(PRE_EPOCH_NUM):
+    for epoch in range(PRE_EPOCH_NUM):
         loss = pre_train_epoch(sess, generator, gen_data_loader)
         if epoch % 5 == 0:
             generate_samples(sess, generator, BATCH_SIZE, generated_num, eval_file)
@@ -125,7 +128,7 @@ def main():
         dis_data_loader.load_train_data(positive_file, negative_file)
         for _ in range(3):
             dis_data_loader.reset_pointer()
-            for it in xrange(dis_data_loader.num_batch):
+            for it in range(dis_data_loader.num_batch):
                 x_batch, y_batch = dis_data_loader.next_batch()
                 feed = {
                     discriminator.input_x: x_batch,
@@ -166,7 +169,7 @@ def main():
 
             for _ in range(3):
                 dis_data_loader.reset_pointer()
-                for it in xrange(dis_data_loader.num_batch):
+                for it in range(dis_data_loader.num_batch):
                     x_batch, y_batch = dis_data_loader.next_batch()
                     feed = {
                         discriminator.input_x: x_batch,
