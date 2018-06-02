@@ -100,8 +100,19 @@ def main():
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-    sess = tf.Session(config=config)
-    sess.run(tf.global_variables_initializer())
+
+    with tf.Session(config=config) as sess: 
+
+        train_writer = tf.summary.FileWriter( './logs/1/train ', sess.graph)
+
+        merge = tf.summary.merge_all()
+
+        summary = sess.run([merge, tf.global_variables_initializer()])
+
+        train_writer.add_summary(summary, counter)
+
+    # sess = tf.Session(config=config)
+    # sess.run(tf.global_variables_initializer())
 
     # First, use the oracle model to provide the positive examples, which are sampled from the oracle data distribution
     generate_samples(sess, target_lstm, BATCH_SIZE, generated_num, positive_file)
@@ -112,11 +123,13 @@ def main():
     print('Start pre-training...')
     log.write('pre-training...\n')
     for epoch in range(PRE_EPOCH_NUM):
+        tf.summary.histogram('generator epoch', epoch)
         loss = pre_train_epoch(sess, generator, gen_data_loader)
         if epoch % 5 == 0:
             generate_samples(sess, generator, BATCH_SIZE, generated_num, eval_file)
             likelihood_data_loader.create_batches(eval_file)
             test_loss = target_loss(sess, target_lstm, likelihood_data_loader)
+            tf.summary.histogram('generator pre-train loss', test_loss)
             print('pre-train epoch ', epoch, 'test_loss ', test_loss)
             buffer = 'epoch:\t'+ str(epoch) + '\tnll:\t' + str(test_loss) + '\n'
             log.write(buffer)
@@ -155,6 +168,7 @@ def main():
             generate_samples(sess, generator, BATCH_SIZE, generated_num, eval_file)
             likelihood_data_loader.create_batches(eval_file)
             test_loss = target_loss(sess, target_lstm, likelihood_data_loader)
+            tf.summary.histogram('generator train loss', test_loss)
             buffer = 'epoch:\t' + str(total_batch) + '\tnll:\t' + str(test_loss) + '\n'
             print('total_batch: ', total_batch, 'test_loss: ', test_loss)
             log.write(buffer)
