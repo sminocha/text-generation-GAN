@@ -2,7 +2,7 @@ import sys
 import os
 import math
 import operator
-
+import argparse
 
 featureMap = {}
 sentCounts = {}
@@ -58,6 +58,21 @@ def generate_sentence(sentiment=4, length=5):
     review = ' '.join(wordsToAdd).lower()
     print(review)
 
+parser = argparse.ArgumentParser(description='Flag and select sentiment/number of words')
+parser.add_argument("--s", help="Set sentiment")
+parser.add_argument("--n", help="Set numWords")
+args = parser.parse_args()
+sentiment = 4
+numWords = 25
+if args.s:
+    sentiment = int(args.s)
+if args.n:
+    numWords = int(args.n)
+
+if sentiment>4 or sentiment<0 or numWords<1:
+    print("Error! Sentiment/Num Words flags out of bounds.")
+    print("Refer to README.md for further instructions.")
+    sys.exit(0)
 pull_relations(total)
-generate_sentence(sentiment=4, length=25)
+generate_sentence(sentiment=sentiment, length=numWords)
 
