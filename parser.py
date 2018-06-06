@@ -7,10 +7,10 @@ for y in sst.train_reader():
 	for tree in y:
 		if type(tree) == Tree:
 			sent = " ".join(tree.leaves())
-		#else:
-		#	sent += " " + str(tree)
-	data.append(sent)
+		else:
+			if int(tree) < 2:
+				data.append(sent)
 
-f = open("processed_train_data_no_label.txt", 'w+')
+f = open("processed_train_neg_data_no_label.txt", 'w+')
 for sent in data:
 	f.write(sent + "\n")
